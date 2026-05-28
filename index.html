@@ -1,0 +1,1063 @@
+# h5news
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>被折叠的世界：从报刊亭到算法墙</title>
+<style>
+@import url('[https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap](https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;400;700&display=swap)');
+
+:root {
+  --paper: #f2ead8;
+  --ink: #1a1208;
+  --rust: #8b3a1a;
+  --algo-blue: #0a1628;
+  --algo-cyan: #00d4ff;
+  --algo-dim: #0d2240;
+  --fold-line: #c4a882;
+  --noise: rgba(139, 100, 50, 0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif SC', serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 噪点纹理层 ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='[http://www.w3.org/2000/svg'%3E%3Cfilter](http://www.w3.org/2000/svg'%3E%3Cfilter) id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.6;
+}
+
+/* ══════════════════════════════
+SECTION 1：封面 — 报刊亭时代
+══════════════════════════════ */
+.cover {
+  min-height: 100vh;
+  background: var(--paper);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.masthead-bar {
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  padding: 6px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.cover-dateline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  border-bottom: 2px solid var(--ink);
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--rust);
+}
+
+.cover-title-block {
+  padding: 24px 20px 12px;
+  border-bottom: 4px double var(--ink);
+}
+
+.cover-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--rust);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.cover-headline {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: clamp(36px, 12vw, 52px);
+  line-height: 1.1;
+  color: var(--ink);
+  letter-spacing: -1px;
+}
+
+.cover-headline em {
+  font-style: normal;
+  -webkit-text-stroke: 1.5px var(--ink);
+  color: transparent;
+}
+
+.cover-subhead {
+  margin-top: 12px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0.8;
+  line-height: 1.7;
+}
+
+/* 报纸双栏响应式布局 */
+.newspaper-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 3px solid var(--ink);
+  margin: 0 20px;
+}
+
+@media(min-width: 600px) {
+  .newspaper-grid {
+    grid-template-columns: 2fr 1px 1fr;
+    gap: 0;
+  }
+  .col-divider {
+    background: repeating-linear-gradient(to bottom, var(--ink) 0, var(--ink) 4px, transparent 4px, transparent 8px);
+    margin: 0 12px;
+    opacity: 0.25;
+  }
+}
+
+.news-col-main {
+  padding-right: 0px;
+}
+@media(min-width: 600px) { .news-col-main { padding-right: 16px; } }
+
+.drop-cap-para {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink);
+  text-align: justify;
+}
+
+.drop-cap-para::first-letter {
+  float: left;
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 0.85;
+  margin-right: 6px;
+  margin-top: 4px;
+  color: var(--rust);
+  font-family: 'Noto Serif SC', serif;
+}
+
+.pull-quote {
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.pull-quote p {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--rust);
+}
+
+.side-brief {
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(26,18,8,0.2);
+}
+
+.side-brief h4 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.side-brief p {
+  font-size: 12px;
+  line-height: 1.7;
+  color: rgba(26,18,8,0.75);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 300;
+}
+
+.ad-block {
+  margin-top: 10px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 8px;
+  text-align: center;
+}
+
+.ad-block span {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.ad-block p {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.edition-num {
+  padding: 16px 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(26,18,8,0.5);
+  text-align: center;
+  border-top: 1px solid rgba(26,18,8,0.15);
+}
+
+/* ══════════════════════════════
+折叠过渡带
+══════════════════════════════ */
+.fold-transition {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--paper) 0%, #c8b89a 30%, #5a7a9a 65%, var(--algo-blue) 100%);
+}
+
+.fold-lines {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 30px 20px;
+}
+
+.fold-line-item {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: foldPulse 3s ease-in-out infinite;
+}
+
+.fold-line-item:nth-child(odd) { animation-delay: 0.3s; }
+.fold-line-item:nth-child(3n) { animation-delay: 0.6s; }
+
+@keyframes foldPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+.fold-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════
+SECTION 2：算法时代
+══════════════════════════════ */
+.algo-world {
+  background: var(--algo-blue);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 60px;
+}
+
+.algo-world::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.algo-header {
+  padding: 40px 20px 20px;
+  border-bottom: 1px solid rgba(0,212,255,0.2);
+  position: relative;
+}
+
+.algo-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--algo-cyan);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.algo-tag::before {
+  content: '▶ ';
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.algo-headline {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.algo-headline span {
+  color: var(--algo-cyan);
+}
+
+/* 信息流卡片 */
+.feed-container {
+  padding: 20px 20px 0;
+}
+
+.feed-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,212,255,0.5);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.feed-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(0,212,255,0.12);
+  border-left: 3px solid var(--algo-cyan);
+  margin-bottom: 8px;
+  padding: 16px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.feed-card.dimmed {
+  border-left-color: rgba(0,212,255,0.2);
+  opacity: 0.35;
+}
+
+.feed-card.highlighted {
+  background: rgba(0,212,255,0.07);
+  border-left-color: var(--algo-cyan);
+}
+
+.feed-card-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--algo-cyan);
+  opacity: 0.8;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.feed-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  line-height: 1.5;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.feed-card-meta {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+}
+
+.feed-card-meta .match-score {
+  color: var(--algo-cyan);
+}
+
+/* 算法说明框 */
+.algo-explain {
+  margin: 24px 20px 0;
+  padding: 20px;
+  border: 1px solid rgba(0,212,255,0.2);
+  background: rgba(0,212,255,0.04);
+  position: relative;
+}
+
+.algo-explain::before {
+  content: 'SYSTEM';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  background: var(--algo-blue);
+  padding: 0 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--algo-cyan);
+}
+
+.algo-explain p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 300;
+}
+
+.algo-explain p strong {
+  color: var(--algo-cyan);
+  font-weight: 700;
+}
+
+/* ══════════════════════════════
+SECTION 3：对照叙事
+══════════════════════════════ */
+.compare-section {
+  background: var(--algo-blue);
+  padding: 30px 20px;
+}
+
+.compare-section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(0,212,255,0.4);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.compare-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
+  background: rgba(255,255,255,0.02);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+@media(min-width: 600px) {
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 0;
+    background: transparent;
+    padding: 0;
+  }
+}
+
+.compare-cell {
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.compare-cell.old {
+  background: rgba(242,234,216,0.06);
+  color: rgba(242,234,216,0.75);
+  border-left: 2px solid rgba(242,234,216,0.25);
+}
+@media(min-width: 600px) { .compare-cell.old { text-align: right; } }
+
+.compare-cell.new {
+  background: rgba(0,212,255,0.04);
+  color: rgba(0,212,255,0.75);
+  border-left: 2px solid rgba(0,212,255,0.25);
+}
+
+.compare-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,212,255,0.3);
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  font-weight: bold;
+  padding: 4px 0;
+}
+
+/* ══════════════════════════════
+SECTION 4：数据可视化墙
+══════════════════════════════ */
+.data-wall {
+  background: var(--algo-blue);
+  padding: 30px 20px;
+}
+
+.data-wall-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.data-wall-sub {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 24px;
+}
+
+.vision-bars {
+  margin-bottom: 28px;
+}
+
+.vision-bar-row {
+  margin-bottom: 12px;
+}
+
+.vision-bar-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 6px;
+}
+
+.vision-bar-track {
+  height: 24px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+}
+
+.vision-bar-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  transition: width 1.5s cubic-bezier(0.1, 1, 0.1, 1);
+  width: 0;
+}
+
+.vision-bar-fill::after {
+  content: attr(data-pct);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: #000;
+  font-weight: 700;
+}
+
+/* 当激活可见时才触发动效 */
+.visible .vision-bar-fill.era-print { background: linear-gradient(90deg, #c4a882, #a08060); width: 85%; }
+.visible .vision-bar-fill.era-early-net { background: linear-gradient(90deg, #6a9ab0, #4a7a9a); width: 70%; }
+.visible .vision-bar-fill.era-social { background: linear-gradient(90deg, #2a5a8a, #1a3a6a); width: 40%; }
+.visible .vision-bar-fill.era-algo { background: linear-gradient(90deg, var(--algo-cyan), #0090bb); width: 18%; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+@media(min-width: 480px) { .stat-grid { grid-template-columns: 1fr 1fr; } }
+
+.stat-card {
+  padding: 16px 14px;
+  border: 1px solid rgba(0,212,255,0.15);
+  background: rgba(0,212,255,0.04);
+}
+
+.stat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--algo-cyan);
+  line-height: 1;
+}
+
+.stat-unit {
+  font-size: 12px;
+  color: rgba(0,212,255,0.6);
+}
+
+.stat-desc {
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════
+SECTION 5：作者按语 / 结尾
+══════════════════════════════ */
+.epilogue {
+  background: var(--ink);
+  padding: 40px 20px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.epilogue::before {
+  content: '知 见';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: clamp(80px, 20vw, 120px);
+  font-weight: 900;
+  color: rgba(255,255,255,0.02);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.epilogue-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.epilogue-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.epilogue-body {
+  font-size: 14px;
+  line-height: 2;
+  color: rgba(255,255,255,0.6);
+  font-family: 'Noto Sans SC', sans-serif;
+  text-align: justify;
+}
+
+.epilogue-body strong {
+  color: rgba(255,255,255,0.9);
+}
+
+.divider-dots {
+  text-align: center;
+  margin: 24px 0;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 8px;
+  color: rgba(255,255,255,0.15);
+}
+
+.author-sig {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.author-name {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+}
+
+.author-name span {
+  display: block;
+  font-size: 10px;
+  margin-top: 4px;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.share-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.3);
+  text-align: right;
+}
+
+/* ══════════════════════════════
+公共组件组件 & 动效
+══════════════════════════════ */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rust), var(--algo-cyan));
+  width: 0%;
+  z-index: 9999;
+}
+
+.chapter-tag {
+  position: fixed;
+  bottom: 20px;
+  right: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  pointer-events: none;
+  z-index: 999;
+  border-radius: 2px;
+}
+
+.chapter-tag.light { color: var(--rust); background: rgba(242,234,216,0.95); }
+.chapter-tag.dark { color: var(--algo-cyan); background: rgba(10,22,40,0.95); }
+
+.section-divider {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--algo-blue);
+  padding: 0 20px;
+}
+
+.section-divider span {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,212,255,0.4);
+}
+
+.section-divider::before, .section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(0,212,255,0.15);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.15s; }
+.reveal-delay-2 { transition-delay: 0.3s; }
+.reveal-delay-3 { transition-delay: 0.45s; }
+.reveal-delay-4 { transition-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="chapter-tag light" id="chapterTag">报刊亭时代</div>
+
+<!-- ══════════════ COVER ══════════════ -->
+<section class="cover" data-chapter="报刊亭时代" data-theme="light">
+  <div class="masthead-bar">
+    THE FOLDED WORLD GAZETTE &nbsp;·&nbsp; 信息生态观察 &nbsp;·&nbsp; SPECIAL EDITION
+  </div>
+
+  <div class="cover-dateline">
+    <span>VOL. XXIII · NO. 08</span>
+    <span>信息与社会 / MEDIA & SOCIETY</span>
+    <span>2026年</span>
+  </div>
+
+  <div class="cover-title-block">
+    <div class="cover-eyebrow">深度调查 · LONG READ</div>
+    <h1 class="cover-headline">被折叠<br>的<em>世界</em></h1>
+    <p class="cover-subhead">从报刊亭到算法墙，我们的信息视野是如何一步步收窄、折叠、最终变成一堵只映照自身的镜墙？</p>
+  </div>
+
+  <div class="newspaper-grid">
+    <div class="news-col-main">
+      <p class="drop-cap-para">
+        报刊亭曾是一座城市的神经末梢。站在那里，你会同时看到关于政治的争吵、体育的狂欢、科学的惊奇以及遥远战场上的烟火——这些信息并不因为你的喜好而筛选自己，它们只是在那里，等你拿起，或者略过。
+      </p>
+      <div class="pull-quote">
+        <p>"当信息不再流动，<br>而是朝你涌来——<br>世界就开始折叠。"</p>
+      </div>
+      <p style="font-size:13px; line-height:1.85; color:var(--ink); text-align:justify; margin-top:8px;">
+        互联网的诞生，起初让这一切变得更加壮阔。任何角落的声音都能被听见，任何边缘的视角都能被发现。然而，技术从未在宽阔处停留太久——流量的逻辑最终将它引向了另一个方向。
+      </p>
+    </div>
+
+    <div class="col-divider"></div>
+
+    <div class="news-col-side">
+      <div class="side-brief">
+        <h4>简 讯</h4>
+        <p>研究显示，算法推荐使用者平均每天接触的新闻议题类型减少了63%，但停留时长增加了240%。</p>
+      </div>
+      <div class="side-brief">
+        <h4>背 景</h4>
+        <p>1990年代，一份城市日报 average 涵盖22个不同议题领域。2024年，一个普通用户的信息流平均仅涵盖4.7个。</p>
+      </div>
+      <div class="side-brief">
+        <h4>术 语</h4>
+        <p>"信息茧房"（Filter Bubble）由网络活动家伊莱·帕里泽在2011年提出，指算法将用户包裹在偏好信息的茧壳之中。</p>
+      </div>
+      <div class="ad-block">
+        <span>SPONSORED</span>
+        <p>您的算法<br>正在为您工作</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="edition-num">CONTINUED ON NEXT SECTION · 下接算法时代 ↓</div>
+</section>
+
+<!-- ══════════════ 折叠过渡 ══════════════ -->
+<div class="fold-transition">
+  <div class="fold-lines">
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+    <div class="fold-line-item"></div>
+  </div>
+  <div class="fold-label">· · · 世界正在折叠 · FOLDING · · ·</div>
+</div>
+
+<!-- ══════════════ 算法世界 ══════════════ -->
+<section class="algo-world" data-chapter="算法墙时代" data-theme="dark">
+  <div class="algo-header reveal">
+    <div class="algo-tag">ALGORITHM FEED · 个性化推送</div>
+    <h2 class="algo-headline">你的专属<span>信息墙</span><br>已搭建完成</h2>
+  </div>
+
+  <div class="feed-container reveal reveal-delay-1">
+    <div class="feed-label">// 为您精选 · 匹配度 &gt; 87%</div>
+
+    <div class="feed-card highlighted">
+      <div class="feed-card-tag">强烈推荐 · RECOMMENDED</div>
+      <div class="feed-card-title">您关注的领域再次出现重大突破，与您过往98%的阅读偏好高度吻合</div>
+      <div class="feed-card-meta">
+        <span class="match-score">匹配度 98%</span>
+        <span>· 2分钟前</span>
+        <span>· 预计阅读5分钟</span>
+      </div>
+    </div>
+
+    <div class="feed-card highlighted">
+      <div class="feed-card-tag">热门话题 · TRENDING FOR YOU</div>
+      <div class="feed-card-title">基于您的浏览历史，系统为您过滤了1,247条"不感兴趣"的内容</div>
+      <div class="feed-card-meta">
+        <span class="match-score">匹配度 94%</span>
+        <span>· 15分钟前</span>
+        <span>· 预计阅读3分钟</span>
+      </div>
+    </div>
+
+    <div class="feed-card dimmed">
+      <div class="feed-card-tag">已过滤 · FILTERED OUT</div>
+      <div class="feed-card-title">关于您不常浏览话题的深度报道——[内容已折叠]</div>
+      <div class="feed-card-meta">
+        <span style="color:rgba(255,255,255,0.2)">匹配度 12%</span>
+        <span>· 已屏蔽</span>
+      </div>
+    </div>
+
+    <div class="feed-card dimmed">
+      <div class="feed-card-tag">已过滤 · FILTERED OUT</div>
+      <div class="feed-card-title">来自与您观点相左的媒体的分析文章——[内容已折叠]</div>
+      <div class="feed-card-meta">
+        <span style="color:rgba(255,255,255,0.2)">匹配度 8%</span>
+        <span>· 已屏蔽</span>
+      </div>
+    </div>
+
+    <div class="feed-card dimmed">
+      <div class="feed-card-tag">已过滤 · FILTERED OUT</div>
+      <div class="feed-card-title">国际视角：其他国家如何看待同一件事——[内容已折叠]</div>
+      <div class="feed-card-meta">
+        <span style="color:rgba(255,255,255,0.2)">匹配度 5%</span>
+        <span>· 已屏蔽</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-explain reveal reveal-delay-2">
+    <p>
+      系统已学习您的 <strong>2,847次</strong> 点击行为、<strong>893小时</strong> 观看记录及 <strong>114个</strong> 情绪反应数据点。<br><br>
+      当前版本的"您的世界"已优化完毕。所有<strong>令您不适的内容</strong>、<strong>挑战您认知的信息</strong>、以及<strong>来自陌生视角的声音</strong>，均已被善意地折叠。<br><br>
+      <strong>您感到舒适，即是我们的使命。</strong>
+    </p>
+  </div>
+
+  <div class="section-divider"><span>今昔对照</span></div>
+
+  <div class="compare-section reveal">
+    <div class="compare-section-label">// THEN VS NOW · 那时与今日</div>
+
+    <div class="compare-row">
+      <div class="compare-cell old">你走进报刊亭，拿起一份与你政见不同的报纸，因为它的体育版很好看。</div>
+      <div class="compare-vs">vs</div>
+      <div class="compare-cell new">SYSTEM: 已识别您的政治偏好。相关媒体已降权处理。</div>
+    </div>
+
+    <div class="compare-row">
+      <div class="compare-cell old">一条突发新闻打断了你的下午茶，关于一个你从未听说过的地方。</div>
+      <div class="compare-vs">vs</div>
+      <div class="compare-cell new">SYSTEM: 该地区内容与您历史数据相关性低于阈值，已折叠。</div>
+    </div>
+
+    <div class="compare-row">
+      <div class="compare-cell old">你与邻居争论，他读的报纸和你不同，你们各有道理。</div>
+      <div class="compare-vs">vs</div>
+      <div class="compare-cell new">SYSTEM: 为您优先展示与您观点相近的评论。已屏蔽136条异见。</div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span>数据实证</span></div>
+
+  <div class="data-wall reveal">
+    <div class="data-wall-title">信息视野：正在变窄</div>
+    <div class="data-wall-sub">不同时代用户接触议题多样性指数（模拟数据）</div>
+
+    <div class="vision-bars">
+      <div class="vision-bar-row">
+        <div class="vision-bar-label">1980s 印刷时代</div>
+        <div class="vision-bar-track">
+          <div class="vision-bar-fill era-print" data-pct="85%"></div>
+        </div>
+      </div>
+      <div class="vision-bar-row">
+        <div class="vision-bar-label">2000s 早期互联网</div>
+        <div class="vision-bar-track">
+          <div class="vision-bar-fill era-early-net" data-pct="70%"></div>
+        </div>
+      </div>
+      <div class="vision-bar-row">
+        <div class="vision-bar-label">2010s 社交媒体</div>
+        <div class="vision-bar-track">
+          <div class="vision-bar-fill era-social" data-pct="40%"></div>
+        </div>
+      </div>
+      <div class="vision-bar-row">
+        <div class="vision-bar-label">2020s 算法推荐</div>
+        <div class="vision-bar-track">
+          <div class="vision-bar-fill era-algo" data-pct="18%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card reveal reveal-delay-1">
+        <div class="stat-num">63<span class="stat-unit">%</span></div>
+        <div class="stat-desc">算法用户接触议题类型的减少幅度（对比非算法推荐）</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-2">
+        <div class="stat-num">240<span class="stat-unit">%</span></div>
+        <div class="stat-desc">算法推荐下用户停留时长的增加幅度</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-3">
+        <div class="stat-num">4.7</div>
+        <div class="stat-desc">2024年普通用户信息流平均涵盖议题类别数（1990年代约22个）</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-4">
+        <div class="stat-num">91<span class="stat-unit">%</span></div>
+        <div class="stat-desc">用户表示不清楚哪些内容被算法屏蔽或降权</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 结语 ══════════════ -->
+<section class="epilogue" data-chapter="出路与反思" data-theme="dark">
+  <div class="epilogue-eyebrow">EDITOR'S NOTE · 作者按语</div>
+  <h3 class="epilogue-title">折叠，还是展开？</h3>
+  <p class="epilogue-body">
+    折叠不是坏事的本身——我们的大脑本就无法同时处理所有信息。<strong>问题在于，谁来决定什么被折叠，折叠的尺度是多少，以及我们是否知道折叠正在发生。</strong>
+  </p>
+
+  <div class="divider-dots">· · · · ·</div>
+
+  <p class="epilogue-body">
+    报刊亭的折叠是物理的：你只有两只手，只能拿走几份报纸。但你知道你选择了什么，你也看见了那些你没选的封面。<br><br>
+    算法墙的折叠是隐形的：你以为你看见了世界，其实你看见的，<strong>只是世界关于你的一面镜子</strong>。
+  </p>
+
+  <div class="divider-dots">· · · · ·</div>
+
+  <p class="epilogue-body">
+    这篇文章没有答案。它只是想提醒：<strong>下一次刷新信息流的时候，不妨问一句——今天，我看见了什么是我不想看见的？</strong><br><br>
+    如果答案是"没有"，那堵墙，可能已经很高了。
+  </p>
+
+  <div class="author-sig">
+    <div class="author-name">
+      记者 / Reporter
+      <span>THE FOLDED WORLD GAZETTE</span>
+    </div>
+    <div class="share-hint">
+      SHARE<br>· · ·<br>THINK
+    </div>
+  </div>
+</section>
+
+<script>
+  const progressBar = document.getElementById('progressBar');
+  const chapterTag = document.getElementById('chapterTag');
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+  });
+
+  const sections = document.querySelectorAll('[data-chapter]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const chapter = entry.target.dataset.chapter;
+        const theme = entry.target.dataset.theme;
+        chapterTag.textContent = chapter;
+        chapterTag.className = 'chapter-tag ' + (theme === 'dark' ? 'dark' : 'light');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  sections.forEach(s => observer.observe(s));
+
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.05 });
+
+  reveals.forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>
